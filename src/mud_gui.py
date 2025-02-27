@@ -1,8 +1,8 @@
 import sys
 import asyncio
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
+from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                            QHBoxLayout, QPushButton, QTextEdit, QLineEdit)
-from PyQt6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer
 from mud_client import MUDClient
 
 class MUDClientGUI(QMainWindow):
@@ -74,10 +74,10 @@ class MUDClientGUI(QMainWindow):
     def eventFilter(self, obj, event):
         """Handle key press events for command history"""
         if obj is self.command_input and event.type() == event.Type.KeyPress:
-            if event.key() == Qt.Key.Key_Up:
+            if event.key() == Qt.Key_Up:
                 self._previous_command()
                 return True
-            elif event.key() == Qt.Key.Key_Down:
+            elif event.key() == Qt.Key_Down:
                 self._next_command()
                 return True
         return super().eventFilter(obj, event)
@@ -135,9 +135,10 @@ class MUDClientGUI(QMainWindow):
             
     def display_response(self, response):
         """Display response in the output area"""
-        self.output_area.moveCursor(self.output_area.textCursor().End)
+        cursor = self.output_area.textCursor()
+        cursor.movePosition(cursor.End)
+        self.output_area.setTextCursor(cursor)
         self.output_area.insertPlainText(response)
-        self.output_area.moveCursor(self.output_area.textCursor().End)
         
     def _previous_command(self):
         """Show previous command from history"""

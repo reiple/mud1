@@ -1,6 +1,6 @@
 import pytest
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtCore import Qt
+from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import Qt
 from src.mud_gui import MUDClientGUI
 
 @pytest.fixture
@@ -27,7 +27,7 @@ def test_input_field_sends_command(gui, qtbot):
     """Test that entering a command in the input field sends it to the server"""
     command = "look"
     qtbot.keyClicks(gui.command_input, command)
-    qtbot.keyClick(gui.command_input, Qt.Key.Key_Return)
+    qtbot.keyClick(gui.command_input, Qt.Key_Return)
     
     # Verify input field was cleared
     assert gui.command_input.text() == ""
@@ -53,11 +53,11 @@ def test_command_history(gui, qtbot):
     
     for cmd in commands:
         qtbot.keyClicks(gui.command_input, cmd)
-        qtbot.keyClick(gui.command_input, Qt.Key.Key_Return)
+        qtbot.keyClick(gui.command_input, Qt.Key_Return)
     
     # Test Up key navigation
     for cmd in reversed(commands):
-        qtbot.keyClick(gui.command_input, Qt.Key.Key_Up)
+        qtbot.keyClick(gui.command_input, Qt.Key_Up)
         assert gui.command_input.text() == cmd
 
 def test_reconnect_button_exists(gui):
