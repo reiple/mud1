@@ -1,6 +1,7 @@
 import pytest
 import tkinter as tk
 from src.mud_gui import MUDClientGUI
+import ttk
 
 class TestMUDClientGUI:
     @pytest.fixture
@@ -61,3 +62,19 @@ class TestMUDClientGUI:
         
         assert gui.command_history == commands[::-1]  # Latest command first
         assert len(gui.command_history) <= gui.MAX_HISTORY_SIZE
+
+    def test_reconnect_button_exists(self, gui):
+        """Test that GUI has a reconnect button"""
+        assert gui.reconnect_button is not None
+        assert isinstance(gui.reconnect_button, ttk.Button)
+
+    def test_reconnect_functionality(self, gui, mocker):
+        """Test that reconnect button triggers reconnection"""
+        # Mock the client's connect method
+        mock_connect = mocker.patch.object(gui.client, 'start')
+        
+        # Simulate clicking reconnect button
+        gui.reconnect()
+        
+        # Verify reconnection was attempted
+        mock_connect.assert_called_once_with("146.56.104.221", 8000)
