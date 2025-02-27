@@ -2,3 +2,5 @@ pytest==7.4.3
 pytest-cov==4.1.0
 telnetlib3==2.0.4
 asyncio==3.4.3
+pytest-asyncio==0.23.5
+pytest-tkinter==0.1.1
