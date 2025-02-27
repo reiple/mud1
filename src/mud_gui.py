@@ -1,16 +1,17 @@
 import tkinter as tk
 from tkinter import ttk
 import asyncio
+import sys
 from mud_client import MUDClient
 
 class MUDClientGUI:
-    def __init__(self, root):
+    def __init__(self, root, host="146.56.104.221", port=8000):
         self.root = root
         self.root.title("MUD Client")
         
         # Server connection info
-        self.host = "146.56.104.221"
-        self.port = 8000
+        self.host = host
+        self.port = port
         
         # Initialize MUD client
         self.client = MUDClient()
@@ -22,6 +23,22 @@ class MUDClientGUI:
         
         self._setup_gui()
         self._setup_bindings()
+        
+        # Start connection
+        self.root.after(100, self._initial_connect)
+
+    def _initial_connect(self):
+        """Initial connection attempt after GUI is ready"""
+        self.display_response(f"Connecting to {self.host}:{self.port}...\n")
+        asyncio.create_task(self._async_connect())
+
+    async def _async_connect(self):
+        """Asynchronously connect to the server"""
+        try:
+            await self.client.start(self.host, self.port)
+            self.display_response("Successfully connected to server.\n")
+        except Exception as e:
+            self.display_response(f"Connection failed: {e}\n")
 
     def _setup_gui(self):
         """Set up the GUI components"""
@@ -133,20 +150,31 @@ class MUDClientGUI:
             self.history_index = -1
             self.command_input.delete(0, tk.END)
 
-    async def start(self, host: str, port: int):
-        """Start the MUD client and connect to server"""
-        self.host = host
-        self.port = port
-        try:
-            await self.client.start(host, port)
-        except Exception as e:
-            self.display_response(f"Connection error: {e}\n")
-
-def main():
+async def run_gui():
+    """Run the GUI with asyncio event loop"""
     root = tk.Tk()
     gui = MUDClientGUI(root)
-    asyncio.run(gui.start("146.56.104.221", 8000))
-    root.mainloop()
+    
+    # Setup asyncio loop to run with tkinter
+    async def update():
+        while True:
+            root.update()
+            await asyncio.sleep(0.1)
+    
+    try:
+        await update()
+    except tk.TclError:
+        # Window was closed
+        pass
+
+def main():
+    """Main entry point"""
+    if sys.platform == "win32":
+        # Set up asyncio event loop policy for Windows
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    
+    # Run the asyncio event loop
+    asyncio.run(run_gui())
 
 if __name__ == "__main__":
     main()
